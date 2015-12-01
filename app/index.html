@@ -72,7 +72,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         
         <!--<paper-icon-button icon="icons:menu"></paper-icon-button>-->
         <div class='app-name'>Dosage Designer</div>
-        <paper-tabs class='flex' scrollable no-bar selected='{{card}}'>
+        <paper-tabs class='flex' scrollable no-bar selected='{{card}}' on-selected-changed='cardSelected'>
           <paper-tab>Core</paper-tab>
           <template is='dom-repeat' items='{{coatings}}'>
             <paper-tab>{{item.name}}</paper-tab>
@@ -85,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-toolbar>
 
       <!-- Main Content -->
-      <neon-animated-pages id='nap' class='fit' selected='{{card}}'>
+      <neon-animated-pages id='nap' class='fit'>
         
         <dd-core-card details='{{core}}'></dd-core-card>
       
@@ -110,15 +110,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                  text="Caching complete! This app will work offline.">
     </paper-toast>
 
-    <platinum-sw-register auto-register
-                          clients-claim
-                          skip-waiting
-                          base-uri="elements/bootstrap"
-                          on-service-worker-installed="displayInstalledToast">
-      <platinum-sw-cache default-cache-strategy="fastest"
-                         cache-config-file="cache-config.json">
-      </platinum-sw-cache>
-    </platinum-sw-register>
+    <!--<platinum-sw-register auto-register-->
+    <!--                      clients-claim-->
+    <!--                      skip-waiting-->
+    <!--                      base-uri="elements/bootstrap"-->
+    <!--                      on-service-worker-installed="displayInstalledToast">-->
+    <!--  <platinum-sw-cache default-cache-strategy="fastest"-->
+    <!--                     cache-config-file="cache-config.json">-->
+    <!--  </platinum-sw-cache>-->
+    <!--</platinum-sw-register>-->
 
   </template>
 
