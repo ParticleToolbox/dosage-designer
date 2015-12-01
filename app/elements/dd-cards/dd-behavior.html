@@ -1,0 +1,119 @@
+<!-- universal behaviors for dosage designer -->
+<script>
+          
+  /*global DosageDesignerBehavior*/   
+  DosageDesignerBehavior = {  // jshint ignore:line
+  
+//
+//calculations for sphere      
+//     
+    _bulkDensity: function(apparentDensity){
+        return apparentDensity * 0.74048;
+    }, 
+    
+    _surfaceArea: function(diam) {
+      return 4 * Math.PI * Math.pow(diam / 2 / 10000, 2); //micron to cm
+    }, 
+    
+    _volume: function(diam) {
+      return (4/3) * Math.PI * Math.pow(diam / 2 / 10000, 3); //micron to cm
+    }, 
+    
+    _particleCount: function(dens, vol) {
+      return Math.ceil(1 / dens / vol); //convert micro3 to cm3  
+    }, 
+    
+    _totalSurfaceArea: function(sa, count) {
+      return sa * count;
+    },
+     
+    _surfaceAreaToVolume: function(sa, vol) {
+      return sa / vol;
+    },
+//
+//calculations for coated particles      
+// 
+    _coatedDiameter: function(coreDiam, coreDens, coatWg, coatDens) {
+      var step1 = 1 + (coatWg / 100 * coreDens / coatDens);
+      var step2 = Math.pow(coreDiam/2, 3);
+      var step3 = step1*step2;
+      var step4 = Math.pow(step3, 1.0/3.0) * 2;
+      this.set('details.coated.diameter', step4);
+    },
+      
+    _coatedDensity: function(coreDens, coatDens, wgPercent) {
+      var wg = wgPercent / 100;
+      var cd = (1 / (1 + wg) * coreDens) + (wg / (1 + wg) * coatDens);
+      this.set('details.coated.apparentDensity', cd);
+    },
+      
+    _coatedAssay: function(coreAssay, wg, drug){
+      var batch = 1; //this is one gram batch to help make the calculations more legible
+      var apiStarted = coreAssay * batch; //this gives us mg of API already present
+      var apiAddedGrams = batch * wg / 100  * drug / 100;  //api in grams
+      var apiAdded = apiAddedGrams * 1000;  //api in mg which we care about
+      var endWeight = batch + wg / 100;
+      var assay = (apiStarted + apiAdded) / endWeight;
+      assay = Math.round(assay * 100) / 100;
+      this.set('details.coated.assay', assay);
+    }, 
+    // 
+    _filmThickness: function(startDiam, endDiam) {
+      return (endDiam - startDiam) / 2;
+    },
+    
+    _coatingCoverage: function(startDiam, coreDens, wg) {
+      var vol = this._volume(startDiam);
+      var count = this._particleCount(coreDens, vol);
+      var surfaceArea = this._surfaceArea(startDiam);
+      var totalSurfaceArea = this._totalSurfaceArea(surfaceArea, count);
+      var mass = 1; //mass in grams we include in case we update this calcualtion one day
+      var sa = totalSurfaceArea * mass; //totalSA is in cm2 / grams - this gives us the actual surface are
+      var coatingMG = mass * 1000 * wg / 100; //coating in mg, wg is in percent
+      return coatingMG / sa;          
+    },  
+    
+    _sa2ft: function(startDiam, endDiam, endDens) {
+      //surface area after coating
+      var ft = (endDiam - startDiam) / 2;
+      var vol = this._volume(endDiam);
+      var count = this._particleCount(endDens, vol);
+      var surfaceArea = this._surfaceArea(endDiam);
+      var totalSurfaceArea = this._totalSurfaceArea(surfaceArea, count);
+      return totalSurfaceArea / ft;   
+    }, 
+ 
+//      
+//calculations for capsules
+//  
+    _capsuleFillPercent: function(fillVolume, capsuleVolume){
+      return fillVolume / capsuleVolume * 100;
+    },
+    
+    _capsuleFillVolume: function(volume, count){
+      return volume / count;
+    },
+    
+    _capsuleFillWeight: function(weight, count){
+      return weight / count;
+    },
+    
+    _capsuleCount: function(fillVolume, capsuleVolume){
+      return Math.ceil(fillVolume / capsuleVolume);  //show whole number larger
+    },
+    
+    _doseFillVolume: function(fillWeight, bulkDensity){
+      return fillWeight / 1000 / bulkDensity; //convert grams to mg
+    },
+    
+    _doseFillWeight: function(dose, assay){
+      return dose / assay * 1000;  //assay given as mg/g
+    },
+    
+    _restrictedVolume: function(vol, fill){
+      return vol * fill / 100;
+    }      
+      
+  };
+    
+</script>

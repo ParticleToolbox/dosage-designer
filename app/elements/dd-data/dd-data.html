@@ -1,0 +1,143 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="dd-data">
+  <script>
+  (function() {
+    
+    'use strict';
+    
+    /*global Polymer*/
+    Polymer({
+      
+      is: 'dd-data',
+      
+      properties: {
+        
+        coreData: {
+          type: Object,
+          notify: true,
+          value: function(){
+            return {
+              name: 'Core Material', 
+              product: '', 
+              diameter: 5, 
+              apparentDensity: 1.5, 
+              assay: 0
+            };
+          }
+        },
+        
+        capsuleData: {
+          type: Object,
+          notify: true,
+          value: function(){
+            return {
+              name: 'Capsule', 
+              product: '', 
+              volume: 0.6, 
+              fillRestriction: 85,
+              dose: 75, 
+              coated: {diameter: 123, apparentDensity: 1.5, assay: 123}
+            };
+          }
+        },
+        
+        coatingData: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return [
+              {name: 'Drug Layer', product: '', wg: 40, density: 1.01, apiPercent: 70, 
+                uncoated: {diameter: 123, apparentDensity: 1.5, assay: 0},
+                coated: {diameter: 123, apparentDensity: 1.5, assay: 0}
+              },
+              {name: 'Seal Coat', product: '', wg: 5, density: 1, apiPercent: 0, 
+                uncoated: {diameter: 123, apparentDensity: 1.5, assay: 0},
+                coated: {diameter: 123, apparentDensity: 1.5, assay: 0}
+              },
+              {name: 'Barrier Membrane', product: '', wg: 17, density: 1, apiPercent: 0, 
+                uncoated: {diameter: 123, apparentDensity: 1.5, assay: 0},
+                coated: {diameter: 123, apparentDensity: 1.5, assay: 0}
+              }
+            ];
+          }
+        }
+      },
+      
+      observers: [
+        'coreChanged(coreData.*)',
+        'coatingChanged(coatingData.*)'
+      ],
+      
+      coreChanged: function(changeRecord){
+        switch (changeRecord.path) {
+          case 'coreData.diameter':
+            this.set('coatingData.0.uncoated.diameter', changeRecord.value);
+            break;
+          case 'coreData.assay':
+            this.set('coatingData.0.uncoated.assay', changeRecord.value);
+            break;
+          case 'coreData.apparentDensity':
+            this.set('coatingData.0.uncoated.apparentDensity', changeRecord.value);
+            break;
+        }
+      }, 
+        
+      coatingChanged: function(changeRecord){
+        //polymer path provides index in the string
+        var idx = changeRecord.path.split('.')[1];
+        //check if it exists since we are breaking down the path
+        if(idx){
+          //should be in format of #0 so we remove the # and parse to a number
+          idx = parseFloat(idx.substr(1,1));
+        }
+        // build the initial path layer based on polymer path
+        var layerPath = 'coatingData.#' + idx + '.';
+        
+        if(idx < this.coatingData.length - 1){
+          //if there is a next coating layer update those values the next layer to update
+          var nextLayerPath = 'coatingData.#' + (parseFloat(idx) + 1) + '.';
+          //test what changed an update the next layer
+          switch(changeRecord.path){
+            case layerPath + 'coated.diameter':
+              this.set(nextLayerPath + 'uncoated.diameter', changeRecord.value);
+              break;
+            case layerPath + 'coated.apparentDensity':
+              this.set(nextLayerPath + 'uncoated.apparentDensity', changeRecord.value);
+              break;
+            case layerPath + 'coated.assay':
+              this.set(nextLayerPath + 'uncoated.assay', changeRecord.value);
+              break;
+          } 
+          
+        } else if(idx === this.coatingData.length - 1) {
+          switch(changeRecord.path){
+            case layerPath + 'coated.diameter':
+              this.set('capsuleData.coated.diameter', changeRecord.value);
+              break;
+            case layerPath + 'coated.apparentDensity':
+              this.set('capsuleData.coated.apparentDensity', changeRecord.value);
+              break;
+            case layerPath + 'coated.assay':
+              this.set('capsuleData.coated.assay', changeRecord.value);
+              break;
+          }
+        }
+      }
+      
+    });
+    
+  })();
+  
+  </script>
+</dom-module>

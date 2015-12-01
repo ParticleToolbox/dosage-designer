@@ -1,0 +1,178 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="dd-behavior.html">
+<link rel="import" href='dd-card-styles.html'>
+
+<dom-module id="dd-core-card">
+  <template>
+    
+    <style include='dd-card-styles'></style>
+      
+    <div class='graphicCont'>
+      
+      <paper-toolbar>
+        <h4 class='dashboard_title'>Core Material</h4>
+      </paper-toolbar>
+      
+      <dd-sphere-graphic 
+        id='sphereGraphic'
+        start='{{details.diameter}}'
+        end='0'
+        min='[[minDiam]]'
+        max='[[maxDiam]]'>
+      </dd-sphere-graphic>
+      
+    </div>
+    
+    <div class='inputCont'>
+        <paper-material>
+          
+          <div class='horizontal layout center-justified'>
+            <dd-product-chip
+              title='Core'
+              products='{{suglets}}'>
+            </dd-product-chip>
+            <dd-text-chip
+              title='Sieve Range (&mu;m)'
+              val='[[_computeRangeString(minDiam, maxDiam)]]'
+              max-length='10'
+              lock-input>
+            </dd-text-chip>
+          </div>
+          
+          <div class='horizontal layout center-justified'>
+            <dd-number-chip
+              title='Diameter (&mu;m)'
+              val='{{details.diameter}}'
+              min='[[minDiam]]'
+              max='[[maxDiam]]'
+              step='1'>
+            </dd-number-chip>
+            <dd-number-chip
+              title='Apparent Density (g/ml)'
+              val='{{details.apparentDensity}}'
+              min='0.5'
+              max='3'
+              step='0.01'>
+            </dd-number-chip>
+            <dd-number-chip
+              title='Assay (mg/g)'
+              val='{{details.assay}}'
+              min='0'
+              max='1000'
+              step='1'>
+            </dd-number-chip>
+          </div>
+        </paper-material>
+        
+        <paper-material>
+          <dd-list-text title-font>Core Details</dd-list-text>
+          <dd-list-text val='[[surfaceArea]]' decimals='4' no-line>Surface Area (cm<sup>2</sup>/sphere)</dd-list-text>
+          <dd-list-text val='[[volume]]' decimals='6'>Volume (cm<sup>3</sup>/sphere)</dd-list-text>
+          <dd-list-text val='[[surfaceAreaToVolume]]' decimals='2'>Surface Area / Volume (cm<sup>-1</sup>)</dd-list-text>
+          <dd-list-text val='[[particleCount]]' decimals='0'>Sphere Count (per gram)</dd-list-text>
+          <dd-list-text val='[[totalSurfaceArea]]' decimals='2'>Specific Surface Area (cm<sup>2</sup>/g)</dd-list-text>
+          <dd-list-text val='{{_bulkDensity(details.apparentDensity)}}' decimals='2'>Bulk Density (g/ml)</dd-list-text>
+        </paper-material>
+      </div>
+    
+  </template>
+  
+  <script>
+    (function(){
+      
+      'use strict';
+      
+      /*global Polymer*/
+      Polymer({
+        
+        is: 'dd-core-card',
+        
+        listeners: {
+          'product-selected': '_updateProduct'
+        },
+             
+        /* global DosageDesignerBehavior */   
+        behaviors: [
+          DosageDesignerBehavior
+        ],
+        
+        properties: {
+          details: {
+            type: Object,
+            notify: true
+          }, 
+          minDiam: {
+            type: Number,
+            value: 180
+          },
+          maxDiam: {
+            type: Number,
+            value: 2000
+          },
+          surfaceArea: {
+            type: Number, 
+            computed: '_surfaceArea(details.diameter)'
+          },
+          volume: {
+            type: Number, 
+            computed: '_volume(details.diameter)'
+          },
+          particleCount: {
+            type: Number, 
+            computed: '_particleCount(details.apparentDensity, volume)'
+          }, 
+          totalSurfaceArea: {
+            type: Number, 
+            computed: '_totalSurfaceArea(surfaceArea, particleCount)'
+          }, 
+          surfaceAreaToVolume: {
+            type: Number, 
+            computed: '_surfaceAreaToVolume(surfaceArea, volume)'
+          },
+          suglets: {
+            type: Array,
+            value: function(){
+              return [
+                {label:'Suglet 16/18', diameter: 1100, min:1000, max:1180, density:1.5},
+                {label:'Suglet 18/20', diameter: 925, min:850, max:1000, density:1.5},
+                {label:'Suglet 20/25', diameter: 780, min:710, max:850, density: 1.5},
+                {label:'Suglet 25/30', diameter: 655, min:600, max:710, density: 1.5},
+                {label:'Suglet 30/35', diameter: 550, min:500, max:600, density:1.5},
+                {label:'Suglet 45/60', diameter: 303, min:250, max:355, density:1.5},
+                {label:'Suglet 60/80', diameter: 215, min:180, max:250, density: 1.5},
+                {label:'Custom Size', diameter: 456, min:100, max:3000, density:1.0}
+              ];
+            }
+          }
+        },
+        
+        _updateProduct: function(event, details) {
+          this.set('details.product', details.label);
+          this.set('details.density', details.density);
+          this.set('minDiam', details.min);
+          this.set('maxDiam', details.max);
+          this.set('details.diameter', details.diameter);
+          this.set('assay', 0);
+          if(details.label === 'Custom Size'){
+            this.$.sphereGraphic.set('max', 0);
+            this.$.sphereGraphic.set('min', 0);
+          }
+        },
+        
+        _computeRangeString: function(min, max) {
+          return min + ' - ' + max;
+        }
+      });
+    })();
+  </script>
+</dom-module>

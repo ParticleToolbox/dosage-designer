@@ -1,0 +1,60 @@
+
+
+<dom-module id="dd-card-styles">
+  <template>
+    
+    <style is='custom-style'>
+    
+      :host {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        
+        /* Components */
+        --paper-toolbar-background: inherit;
+        --paper-toolbar-color: inherit;
+      }
+      
+      .inputCont {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        margin: 0 auto;
+        overflow-x: auto;
+      }
+      
+      .graphicCont {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 4;
+        overflow: hidden;
+        max-height: 780px;
+      }
+      
+      paper-material {
+        display: flex;
+        flex-direction: column;
+        max-width: 475px;
+        background-color: white;
+        margin: 16px;
+        padding: 24px;
+      }
+      
+      .dashboard_title {
+        font-weight: 100;
+        font-size: 24px;
+        margin-left: 16px;
+      }
+      
+      /* Tablet and Smaller */
+      @media (max-width: 901px) {
+        
+        .graphicCont {
+          display: none;
+        }      
+        
+      }
+      
+    </style>
+  </template>
+</dom-module>

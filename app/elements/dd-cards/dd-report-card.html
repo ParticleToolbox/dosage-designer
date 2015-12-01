@@ -1,0 +1,349 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="stylesheet" href="../../bower_components/material-design-lite/material.min.css">
+<script src="../../bower_components/material-design-lite/material.min.js"></script>
+<!--<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">-->
+
+<dom-module id="dd-report-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+        overflow-x: auto;
+      }
+      
+      .container {
+        margin: 0px 0px 48px 0px;  
+      }
+      
+      paper-fab {
+        position: fixed;
+        bottom: 36px;
+        right: 36px;
+        z-index: 2;
+      }
+      
+      paper-textarea {
+        min-width: 480px;
+        margin: auto;
+      }
+      
+      table {
+        margin: auto;
+      }
+      
+      h5 {
+        color: var(--dark-primary-color);
+      }
+      
+      paper-input {
+        margin: 36px;
+      }
+    </style>
+    
+    <div class='container'>
+      <div class='mdl-card__title'>
+        <h5 class='mdl-card__title-text'>Project Information</h5>
+      </div>
+      <div class='layout vertical'>
+        <div class='layout horizontal around-justified'>
+          <paper-input label="Company"></paper-input>
+          <paper-input label="Contact"></paper-input>
+        </div>
+        <paper-textarea label="Project Description" rows="2"></paper-textarea>
+      </div>
+    </div>
+    
+    <div class='container'>
+      <div class='mdl-card__title'>
+        <h5 class='mdl-card__title-text'>Product and Summary</h5>
+      </div>
+      <table class="mdl-data-table mdl-js-data-table">
+        <thead>
+          <tr>
+            <th class="mdl-data-table__cell--non-numeric">Layer</th>
+            <th class='center-text'>Product</th>
+            <th class='center-text'>Formulation</th>
+            <th class='center-text'>Weight Gain<br/>%</th>
+            <th class='center-text'>Percent API<br/>%</th>
+            <th class='center-text'>Film Density<br/>(mg/ml)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mdl-data-table__cell--non-numeric">{{core.name}}</td>
+            <td class='center-text'>{{core.product}}</td>
+            <td class='center-text'>  </td>
+            <td class='center-text'> - </td>
+            <td class='center-text'> - </td>
+            <td class='center-text'> - </td>
+          </tr>
+          <template is='dom-repeat' items='{{coatings}}'>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric">{{item.name}}</td>
+              <td class='center-text'>{{item.product}}</td>
+              <td class='center-text'>{{item.formulation}}</td>
+              <td class='center-text'>{{item.wg}}</td>
+              <td class='center-text'>{{item.apiPercent}}</td>
+              <td class='center-text'>{{item.density}}</td>
+            </tr>
+          </template>
+          <tr>
+            <td class="mdl-data-table__cell--non-numeric">{{capsule.name}}</td>
+            <td class='center-text'>{{capsule.product}}</td>
+            <td class='center-text'>  </td>
+            <td class='center-text'> - </td>
+            <td class='center-text'> - </td>
+            <td class='center-text'> - </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class='container'>
+      <div class='mdl-card__title'>
+        <h5 class='mdl-card__title-text'>Particle Summary</h5>
+      </div>
+      <table class="mdl-data-table mdl-js-data-table">
+        <thead>
+          <tr>
+            <th class="mdl-data-table__cell--non-numeric">Coating Layer</th>
+            <th class='center-text'>Diameter<br/>(&mu;m)</th>
+            <th class='center-text'>Assay<br/>(mg/g)</th>
+            <th class='center-text'>Apparent Density<br/>(mg/ml)</th>
+            <th class='center-text'>Bulk Density<br/>(mg/ml)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mdl-data-table__cell--non-numeric">{{core.name}}</td>
+            <td class='center-text'>{{_toFixed(core.diameter, 1)}}</td>
+            <td class='center-text'>{{_toFixed(core.assay, 2)}}</td>
+            <td class='center-text'>{{_toFixed(core.apparentDensity, 2)}}</td>
+            <td class='center-text'>{{_formattedBulkDensity(core.apparentDensity)}}</td>
+          </tr>
+          <template is='dom-repeat' items='{{coatings}}'>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric">{{item.name}}</td>
+              <td class='center-text'>{{_toFixed(item.coated.diameter, 1)}}</td>
+              <td class='center-text'>{{_toFixed(item.coated.assay, 2)}}</td>
+              <td class='center-text'>{{_toFixed(item.coated.apparentDensity, 2)}}</td>
+              <td class='center-text'>{{_formattedBulkDensity(item.coated.apparentDensity)}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class='container'>
+      <div class='mdl-card__title'>
+        <h5 class='mdl-card__title-text'>Film Properties</h5>
+      </div>
+      <table class="mdl-data-table mdl-js-data-table">
+        <thead>
+          <tr>
+            <th class="mdl-data-table__cell--non-numeric">Coating Layer</th>
+            <th class='center-text'>Film Thickness<br/>(&mu;m)</th>
+            <th class='center-text'>Coating Coverage<br/>(mg/g)</th>
+            <th class='center-text'>SA / FT<br/>(mg/ml)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template is='dom-repeat' items='{{coatings}}'>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric">{{item.name}}</td>
+              <td class='center-text'>{{_formattedFilmThickness(item.uncoated.diameter, item.coated.diameter)}}</td>
+              <td class='center-text'>{{_formattedCoatingCoverage(item.uncoated.diameter, item.uncoated.apparentDensity, item.wg)}}</td>
+              <td class='center-text'>{{_formattedSa2ft(item.uncoated.diameter, item.coated.diameter, item.coated.apparentDensity)}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class='container'>
+      <div class='mdl-card__title'>
+        <h5 class='mdl-card__title-text'>Capsule Summary</h5>
+      </div>
+      <table class='mdl-data-table mdl-js-data-table'>
+        <thead>
+          <tr>
+            <th class="mdl-data-table__cell--non-numeric">Characteristic</th>
+            <th class='center-text'>Units</th>
+            <th class='center-text'>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Therapuetic Dose</td>
+            <td class='center-text'>mg</td>
+            <td class='center-text'>{{_toFixed(capsule.dose, 0)}}</td>
+          </tr>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Capsule</td>
+            <td class='center-text'> </td>
+            <td class='center-text mdl-data-table__cell--non-numeric'>{{capsule.product}}</td>
+          </tr>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Maximum Volume</td>
+            <td class='center-text'>ml</td>
+            <td class='center-text'>{{_toFixed(capsule.volume, 2)}}</td>
+          </tr>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Restricted Volume</td>
+            <td class='center-text'>ml</td>
+            <td class='center-text'>{{_toFixed(restrictedVolume, 2)}}</td>
+          </tr>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Capsule Count</td>
+            <td class='center-text'></td>
+            <td class='center-text'>{{capsuleCount}}</td>
+          </tr>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Fill Weight</td>
+            <td class='center-text'>mg/capsule</td>
+            <td class='center-text'>{{_toFixed(capsuleFillWeight, 2)}}</td>
+          </tr>
+          <tr>
+            <td class='mdl-data-table__cell--non-numeric'>Fill Percent</td>
+            <td class='center-text'>%</td>
+            <td class='center-text'>{{_toFixed(capsuleFillPercent, 1)}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <paper-fab id='fab' icon='icons:print' on-tap='_printPage'></paper-fab>
+    
+  </template>
+</dom-module>
+
+<script>
+  (function(){
+    'use strict';
+    
+    /*global Polymer*/
+    Polymer({
+      
+      is: 'dd-report-card',
+      
+      /* global DosageDesignerBehavior */
+      behaviors: [
+        DosageDesignerBehavior
+      ], 
+      
+      properties: {
+        core: {
+          type: Object,
+        },
+        
+        coatings: {
+          type: Array
+        },
+        
+        capsule: {
+          type: Object
+        }, 
+        
+        finalBulkDensity: {
+          type: Number,
+          computed: '_bulkDensity(capsule.coated.apparentDensity)'
+        }, 
+        
+        restrictedVolume: {
+          type: Number, 
+          computed: '_restrictedVolume(capsule.volume, capsule.fillRestriction)'
+        }, 
+        
+        doseFillWeight: {
+          type: Number, 
+          computed: '_doseFillWeight(capsule.dose, capsule.coated.assay)'
+        },
+        
+        doseFillVolume: {
+          type: Number, 
+          computed: '_doseFillVolume(doseFillWeight, finalBulkDensity)'
+        }, 
+        
+        capsuleCount: {
+          type: Number, 
+          computed: '_capsuleCount(doseFillVolume, restrictedVolume)'
+        }, 
+        
+        capsuleFillWeight: {
+          type: Number, 
+          computed: '_capsuleFillWeight(doseFillWeight, capsuleCount)'
+        },
+        
+        capsuleFillVolume: {
+          type: Number, 
+          computed: '_capsuleFillVolume(doseFillVolume, capsuleCount)'
+        }, 
+        
+        capsuleFillPercent: {
+          type: Number, 
+          computed: '_capsuleFillPercent(capsuleFillVolume, capsule.volume)'
+        }, 
+      },
+      
+      _printPage: function() {
+        //select and hide the main view in index.html
+        document.querySelector('paper-header-panel').style.display = 'none';
+        //hide paper fab
+        this.querySelector('paper-fab').style.display = 'none';
+        //add the report card to body as only visible elemetn
+        document.querySelector('body').appendChild(this);
+        this.style.overflow = 'visible';
+        //call print
+        window.print();
+        //after print apped the report card element back to neon animated pages as last item
+        document.querySelector('neon-animated-pages').appendChild(this);
+        this.style.overflow = 'auto';
+        //show the main view, paper drawer panel again
+        document.querySelector('paper-header-panel').style.display = 'flex';
+        //hide paper fab
+        this.querySelector('paper-fab').style.display = 'block';
+      }, 
+      
+      _toFixed: function(val, decimals){
+        if(!isNaN(val)){
+          return parseFloat(val).toFixed(decimals);
+        } else {
+          return val;
+        }
+        
+      },
+      
+      _formattedBulkDensity: function(apparentDensity){
+        var bd = apparentDensity * 0.74048;
+        return bd.toFixed(2);
+      }, 
+      
+      _formattedFilmThickness: function(startDiam, endDiam) {
+        var ft = this._filmThickness(startDiam, endDiam);
+        return ft.toFixed(2);
+      }, 
+      
+      _formattedCoatingCoverage: function(startDiam, startDens, wg){
+        var cc = this._coatingCoverage(startDiam, startDens, wg);
+        return cc.toFixed(2);
+      },
+      
+      _formattedSa2ft: function(startDiam, endDiam, endDens){
+        var ratio = this._sa2ft(startDiam, endDiam, endDens);
+        return ratio.toFixed(2);
+      }
+      
+    });
+  })();
+</script>  

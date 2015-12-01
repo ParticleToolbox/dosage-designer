@@ -1,0 +1,213 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="dd-behavior.html">
+<link rel="import" href="dd-card-styles.html">
+
+<dom-module id="dd-coating-card">
+  <template>
+    
+    <style include='dd-card-styles'>
+      
+      .page-title-input {
+        border: none;
+        background-color: inherit;
+        color: inherit;
+        font-family: Roboto;
+        font-size: 26px;
+        font-weight: 100;
+      }
+      
+      .page-title-input:focus {
+        outline: none;
+        color: var(--dark-primary-color);
+      }    
+      
+    </style>
+      
+    
+    <div class='graphicCont'>
+      
+      <paper-toolbar>
+        <input class='page-title-input' value='{{details.name::change}}'></input>
+      </paper-toolbar>
+      
+      <dd-sphere-graphic 
+        start='{{details.uncoated.diameter}}'
+        end='{{details.coated.diameter}}'>
+      </dd-sphere-graphic>
+      
+    </div>
+    
+    <div class='inputCont'>
+      <paper-material>
+        
+        <div class='horizontal layout center-justified'>
+          <dd-product-chip
+            title='Coating'
+            products='{{coatings}}'>
+          </dd-product-chip>
+          <dd-text-chip
+            title='Formulation'
+            val='{{details.formulation}}'
+            max-length='10'>
+          </dd-text-chip>
+        </div>
+        
+        <div class='horizontal layout center-justified'>
+          <dd-number-chip
+            title='Weight Gain (%)'
+            val='{{details.wg}}'
+            min='0.1'
+            max='200'
+            step='0.1'>
+          </dd-number-chip>
+          <dd-number-chip
+            title='Film Density (g/ml)'
+            val='{{details.density}}'
+            min='0.5'
+            max='3'
+            step='0.01'>
+          </dd-number-chip>
+          <dd-number-chip
+            title='Percent API (%)'
+            val='{{details.apiPercent}}'
+            min='0'
+            max='100'
+            step='0.1'>
+          </dd-number-chip>
+        </div>
+      </paper-material>
+      
+      <paper-material>
+        <dd-list-dual-text 
+          title-font
+          val-one='Uncoated'
+          val-two='Coated'>
+          Particle Details
+        </dd-list-dual-text>
+        <dd-list-dual-text 
+          no-line
+          decimals='1'
+          val-one='[[details.uncoated.diameter]]'
+          val-two='[[details.coated.diameter]]'>
+          Diameter (&mu;m)
+        </dd-list-dual-text>
+        <dd-list-dual-text 
+          decimals='1'
+          val-one='[[details.uncoated.assay]]'
+          val-two='[[details.coated.assay]]'>
+          Assay (mg/g)
+        </dd-list-dual-text>
+        <dd-list-dual-text 
+          decimals='2'
+          val-one='[[details.uncoated.apparentDensity]]'
+          val-two='[[details.coated.apparentDensity]]'>
+          Apparent Density (g/ml)
+        </dd-list-dual-text>
+        <dd-list-dual-text 
+          decimals='2'
+          val-one='[[_bulkDensity(details.uncoated.apparentDensity)]]'
+          val-two='[[_bulkDensity(details.coated.apparentDensity)]]'>
+          Bulk Density (g/ml)
+        </dd-list-dual-text>
+        <dd-list-text double val='{{filmThickness}}' decimals='2'>Film Thickness (&mu;m)</dd-list-text>
+        <dd-list-text double val='{{coatingCoverage}}' decimals='3'>Coating Coverage (mg/cm<sup>3</sup>)</dd-list-text>
+        <dd-list-text double val='{{sa2ft}}' decimals='4'>SA / FT (cm<sup>2</sup>/&mu;m)</dd-list-text>
+      </paper-material>
+    </div>
+    
+  </template>
+  
+  <script>
+    (function(){
+      
+      'use strict';
+      
+      /*global Polymer*/
+      Polymer({
+        
+        is: 'dd-coating-card',
+        
+        observers: [
+          '_coatedDiameter(details.uncoated.diameter, details.uncoated.apparentDensity, details.wg, details.density)',
+          '_coatedDensity(details.uncoated.apparentDensity, details.density, details.wg)',
+          '_coatedAssay(details.uncoated.assay, details.wg, details.apiPercent)'
+        ],
+        
+        listeners: {
+          'product-selected': '_updateProduct'
+        },
+        
+        /* global DosageDesignerBehavior */   
+        behaviors: [
+          DosageDesignerBehavior
+        ],
+        
+        properties: {
+          
+          details: {
+            type: Object,
+            notify: true,
+          }, 
+          filmThickness: {
+              type: Number,
+              computed: '_filmThickness(details.uncoated.diameter, details.coated.diameter)'
+          }, 
+          coatingCoverage: {
+              type: Number,
+              computed: '_coatingCoverage(details.uncoated.diameter, details.uncoated.apparentDensity, details.wg)'
+          },
+          sa2ft: {
+              type: Number,
+              computed: '_sa2ft(details.uncoated.diameter, details.coated.diameter, details.coated.apparentDensity)'
+          }, 
+          coatings: {
+              type: Array,
+              value: function(){
+                  return [
+                    {label:'Opadry 03A', density:1.01, wg:5},
+                    {label:'Opadry 03K', density:1.01, wg:5},
+                    {label:'Opadry YS-1', density:1.01, wg:5},
+                    {label:'Opadry II 85F', density:1.01, wg:5},
+                    {label:'Acryleze', density:1.64, wg:20},
+                    {label:'Acryleze II', density:1.64, wg:20},
+                    {label:'Opadry Enteric', density:1.21, wg:20},
+                    {label:'Surelease', density:1.01, wg:14},
+                    {label:'Ethocel', density:1.21, wg:12},
+                    {label:'Custom Coating', density:1.01, wg:26}
+                  ];
+              }
+          }
+        }, 
+        
+        ready: function(){
+          if(this.details.name === 'Barrier Membrane'){
+            this.querySelector('dd-product-chip').set('productIndex', 7);
+          } else if(this.details.name === 'Drug Layer'){
+            this.querySelector('dd-product-chip').set('productIndex', 1);
+            this.set('details.apiPercent', 70);
+            this.set('details.wg', 40);
+          } else {
+            this.querySelector('dd-product-chip').set('productIndex', 1);
+          }
+        },
+        
+        _updateProduct: function(event, details) {
+          this.set('details.product', details.label);
+          this.set('details.density', details.density);
+          this.set('details.wg', details.wg);
+        }
+        
+      });
+    })();
+  </script>
+</dom-module>

@@ -1,0 +1,98 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="dd-chip-styles">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        flex-direction: column;
+        min-width: 120px;
+        min-height: 78px;
+        padding: 8px 12px;
+        color: var(--secondary-text-color);
+        font-family: Roboto;
+        /* prevent double tap selection */
+        -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+        -moz-user-select: none; /* mozilla browsers */
+        -khtml-user-select: none; /* webkit (konqueror) browsers */
+        -ms-user-select: none; /* IE10+ */
+      }
+      
+      :host:hover {
+        color: var(--accent-color);
+        background-color: var(--background-color);
+        border-radius: 16px;
+      }
+      
+      .chip-label {
+        font-size: 14px;
+        font-weight: 100;
+        color: var(--third-text-color);
+      }
+      
+      :host:hover > .chip-label{
+        color: var(--accent-color);
+      }
+      
+      .chip-value {
+        font-size: 26px;
+        font-weight: 100;
+        margin: auto 6px;
+      }
+      
+      input {
+        border: none;
+        background-color: inherit;
+        color: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        flex-grow: 1;
+        max-width: 78px;
+        text-align: left;
+      }
+      
+      input.text {
+        max-width: 164px;
+      }
+      
+      input:focus {
+        outline: none;
+        color: var(--accent-color);
+      }
+      
+      /*chrome removal of text spinner */
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      
+      #lockIcon {
+        visibility: hidden;
+        color: var(--accent-color);
+        opacity: 0.8;
+        align-self: center;
+        width: 24px;
+        height: 24px;
+      }
+      
+      :host:hover #lockIcon {
+        visibility: visible;
+        
+      }
+      
+      
+    </style>
+  </template>
+</dom-module>

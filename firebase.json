@@ -1,0 +1,9 @@
+{
+  "firebase": "dosage-designer",
+  "public": "dist",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}

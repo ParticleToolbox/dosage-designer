@@ -1,0 +1,196 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="dd-behavior.html">
+<link rel="import" href="dd-card-styles.html">
+
+<dom-module id="dd-capsule-card">
+  <template>
+    <style include='dd-card-styles'></style>
+    
+    <div class='graphicCont'>
+        
+      <paper-toolbar>
+        <h4 class='dashboard_title'>Capsule</h4>
+      </paper-toolbar>
+      
+      <dd-capsule-graphic
+        capsule-fill-percent='[[capsuleFillPercent]]'
+        capsule-volume-max='[[details.volume]]'
+        capsule-count='[[capsuleCount]]'>
+      </dd-capsule-graphic>
+      
+    </div>
+    
+    <div class='inputCont'>
+        <paper-material>
+          
+          <div class='horizontal layout around-justified'>
+            <dd-product-chip
+              title='Capsule'
+              products='{{capsules}}'>
+            </dd-product-chip>
+            <dd-number-chip
+              id='capVolume'
+              title='Volume (ml)'
+              val='{{details.volume}}'
+              min='0.01'
+              max='2'
+              step='0.01'
+              lock-input>
+            </dd-number-chip>
+          </div>
+          
+          <div class='horizontal layout center-justified'>
+            <dd-number-chip
+              title='Assay (mg/g)'
+              val='{{details.coated.assay}}'
+              min='0.1'
+              max='1000'
+              step='0.1'
+              lock-input>
+            </dd-number-chip>
+            <dd-number-chip
+              title='Dose (mg)'
+              val='{{details.dose}}'
+              min='1'
+              max='500'
+              step='1'>
+            </dd-number-chip>
+            <dd-number-chip
+              title='Fill Restriction (%)'
+              val='{{details.fillRestriction}}'
+              min='1'
+              max='100'
+              step='1'>
+            </dd-number-chip>
+          </div>
+        </paper-material>
+        
+        <paper-material>
+          <dd-list-dual-text 
+            title-font
+            val-one='Total Dose'
+            val-two='Per Capsule'>
+            Capsule Fill
+          </dd-list-dual-text>
+          <dd-list-dual-text 
+            no-line
+            decimals='2'
+            val-one='[[doseFillWeight]]'
+            val-two='[[capsuleFillWeight]]'>
+            Weight (mg)
+          </dd-list-dual-text>
+          <dd-list-dual-text 
+            decimals='2'
+            val-one='[[doseFillVolume]]'
+            val-two='[[capsuleFillVolume]]'>
+            Volume (ml)
+          </dd-list-dual-text>
+          <dd-list-text double val='[[capsuleCount]]' decimals='0'>Capsule Count</dd-list-text>
+          <dd-list-text double val='[[capsuleFillPercent]]' decimals='0'>Fill Percent (%)</dd-list-text>
+        </paper-material>
+      </div>
+      
+  </template>
+  
+  <script>
+    (function(){
+      
+      'use strict';
+      
+      /*global Polymer*/
+      Polymer({
+        
+        is: 'dd-capsule-card',
+        
+        properties: {
+          details: {
+            type: Object,
+            notify: true
+          }, 
+          bulkDensity: {
+            type: Number,
+            computed: '_bulkDensity(details.coated.apparentDensity)'
+          }, 
+          restrictedVolume: {
+            type: Number, 
+            computed: '_restrictedVolume(details.volume, details.fillRestriction)'
+          }, 
+          doseFillWeight: {
+            type: Number, 
+            computed: '_doseFillWeight(details.dose, details.coated.assay)'
+          },
+          doseFillVolume: {
+            type: Number, 
+            computed: '_doseFillVolume(doseFillWeight, bulkDensity)'
+          }, 
+          capsuleCount: {
+            type: Number, 
+            computed: '_capsuleCount(doseFillVolume, restrictedVolume)'
+          }, 
+          capsuleFillWeight: {
+            type: Number, 
+            computed: '_capsuleFillWeight(doseFillWeight, capsuleCount)'
+          },
+          capsuleFillVolume: {
+            type: Number, 
+            computed: '_capsuleFillVolume(doseFillVolume, capsuleCount)'
+          }, 
+          capsuleFillPercent: {
+            type: Number, 
+            computed: '_capsuleFillPercent(capsuleFillVolume, details.volume)'
+          }, 
+          capsules: {
+            type: Array,
+            value: function() {
+              return [
+                {label:'Size 000', volume:1.37},
+                {label:'Size 00', volume:0.95},
+                {label:'Size 0', volume:0.68},
+                {label:'Size 1', volume:0.50},
+                {label:'Size 2', volume:0.37},
+                {label:'Size 3', volume:0.30},
+                {label:'Size 4', volume:0.21},
+                {label:'Size 5', volume:0.13},
+                {label:'Custom', volume:0.60}
+              ];
+            }
+          },
+          isCustomCapsule: {
+            //label of current capsule
+            type: Boolean,
+            value: false,
+            observer: '_isCustomCapsuleChanged'
+          }
+        },
+        
+        listeners: {
+          'product-selected': '_updateProduct'
+        },
+             
+        /* global DosageDesignerBehavior */   
+        behaviors: [DosageDesignerBehavior],
+        
+        _updateProduct: function(event, details) {
+          this.set('details.product', details.label);
+          this.set('details.volume', details.volume);
+          this.isCustomCapsule = (details.label === 'Custom') ? true : false;
+        },
+        
+        _isCustomCapsuleChanged: function(newValue){
+          this.toggleAttribute('lock-input', !newValue, this.$.capVolume);
+        }
+        
+      });
+    })();
+  </script>
+</dom-module>

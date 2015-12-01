@@ -1,0 +1,102 @@
+<script>
+  /*global DDListBehavior*/
+  DDListBehavior = { // jshint ignore:line
+  
+  /*propertes to be used through all list items */
+    properties: {
+      
+      min: {
+        type: Number, 
+        value: 0
+      }, 
+      
+      max: {
+        type: Number, 
+        value: 100000,
+      }, 
+      
+      step: {
+        type: Number, 
+        value: 1
+      },
+      
+      noLine: {
+        type: Boolean,
+        value: false,
+        observer: 'noLineChanged'
+      }, 
+      
+      warning: {
+        type: Boolean,
+        value: false,
+        observer: 'warningChanged'
+      },
+      
+      titleFont: {
+        type: Boolean,
+        value: false,
+        observer: 'titleFontChanged'
+      },
+      
+      double: {
+        type: Boolean,
+        value: false,
+        observer: 'doubleChanged'
+      }
+    }, 
+    
+    doubleChanged: function(newValue){
+      this.toggleClass('double', newValue, this.$.inpt);
+    },
+    
+    titleFontChanged: function(newValue){
+      this.toggleClass('title-font', newValue, this);
+      if(newValue){
+        this.set('noLine', true);
+        this.$.warningIcon.style.display = 'none';
+      }
+    },
+    
+    warningChanged: function(newValue){
+      if(this.$.inptIcon){
+        //hide the input icon when showing the warning
+        this.$.warningIcon.style.display = newValue ? 'block' : 'none';  
+        this.$.inptIcon.style.display = newValue ? 'none' : 'block';
+      } else {
+        //make sure it's displayable
+        this.$.warningIcon.style.display = 'block';  
+        //then hide or show leaving the spacing behind 
+        this.$.warningIcon.style.visibility = newValue ? 'visible' : 'hidden';
+      }
+    },
+    
+    noLineChanged: function(newValue) {
+      this.toggleClass('no-line', newValue, this.$.borderContainer);
+    },
+    
+    highlightBurst: function(node, bounceName) {
+      bounceName = (bounceName === null) ? 'Remove Highlight' : bounceName;
+      this.toggleClass('highlight', true, node);
+        this.debounce(bounceName, function(){
+          this.async(function(){
+            this.toggleClass('highlight', false, node);
+          }, [750]);
+        }, [500]);
+    }, 
+    
+    fireInputError: function(){
+      var errorMessage = 'Value must be between ' + this.min + ' and ' + this.max + '.';
+      this.fire('show-toast', {displayMessage: errorMessage});
+    }, 
+      
+    formatValue: function(v, d){
+      if(isNaN(v) || v === ''){
+        return v;
+      } else {
+        return parseFloat(v).toFixed(d);
+      }
+    }, 
+  };
+  
+  
+</script>
