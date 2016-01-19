@@ -9,8 +9,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!--Imports for these card -->
 <link rel="import" href="dd-behavior.html">
 <link rel="import" href="dd-card-styles.html">
+
+<!--Graphic Import -->
+<link rel="import" href="../dd-capsule-graphic/dd-capsule-graphic.html">
+
+<!-- Imports for custom inputs -->
+<link rel="import" href="../dd-chips/dd-number-chip.html">
+<link rel="import" href="../dd-chips/dd-text-chip.html">
+<link rel="import" href="../dd-chips/dd-product-chip.html">
+<link rel="import" href="../dd-lists/dd-list-dual-text.html">
+<link rel="import" href="../dd-lists/dd-list-text.html">
+<link rel="import" href="../dd-lists/dd-list-input.html">
+
+<!-- Other element imports-->
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 
 <dom-module id="dd-capsule-card">
   <template>
@@ -23,6 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-toolbar>
       
       <dd-capsule-graphic
+        class='graphic'
         capsule-fill-percent='[[capsuleFillPercent]]'
         capsule-volume-max='[[details.volume]]'
         capsule-count='[[capsuleCount]]'>

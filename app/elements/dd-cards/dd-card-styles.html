@@ -18,6 +18,7 @@
       .inputCont {
         display: flex;
         flex-direction: column;
+        align-items: center;
         flex-grow: 1;
         margin: 0 auto;
         overflow-x: auto;
@@ -34,6 +35,7 @@
       paper-material {
         display: flex;
         flex-direction: column;
+        width: 100%;
         max-width: 475px;
         background-color: white;
         margin: 16px;
@@ -49,7 +51,21 @@
       /* Tablet and Smaller */
       @media (max-width: 901px) {
         
+        :host {
+          flex-direction: column;
+          overflow: auto;
+        }
+        
         .graphicCont {
+          flex-grow: 0;
+          overflow: visible;
+        }
+        
+        .inputCont {
+          overflow: visible;
+        }
+        
+        .graphic {
           display: none;
         }      
         

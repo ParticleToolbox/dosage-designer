@@ -15,6 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
 
+  //toast to be shown when cached site
   app.displayInstalledToast = function() {
     // Check to make sure caching is actually enabled—it won't be in the dev environment.
     if (!document.querySelector('platinum-sw-cache').disabled) {
@@ -22,6 +23,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   };
   
+  // event handler to show a toast based on the message provided
+  //typically because of a bad input
+  window.addEventListener('show-toast', function(event) {
+    var toast = document.querySelector('#toast');
+    console.log(event);
+    toast.show();
+  });
+  
+  //setup the animation based on which card is selected
   app.cardSelected = function(e) {
     var nap = document.querySelector('neon-animated-pages');
     var newValue = e.detail.value;
@@ -35,6 +45,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
     nap.set('selected', newValue);
   };
+  
+  app.toggleSync = function() {
+    // app.set('syncData', !app.syncData);
+  };
+  
+  app.goHome = function() {
+    window.location.href = 'https://hoppy-doyle.firebaseapp.com/';
+  };
+  
+  app.closeDrawer = function() {
+    var pdp = document.querySelector('paper-drawer-panel');
+    pdp.closeDrawer();
+  };
+  
+  app.resetValues = function(){
+    //call the reset default values function from the data element
+    // var data = document.querySelector('coating-designer-data');
+    // data.resetDefaultValues();
+  };
 
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
@@ -43,12 +72,5 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     document.querySelector('dd-core-card').querySelector('dd-product-chip').set('productIndex', 2);
     document.querySelector('dd-capsule-card').querySelector('dd-product-chip').set('productIndex', 5);
   });
-
-  // See https://github.com/Polymer/polymer/issues/1381
-  window.addEventListener('WebComponentsReady', function() {
-    // imports are loaded and elements have been registered
-  });
-
   
-
 })(document);

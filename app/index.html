@@ -63,43 +63,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!--customer element to handle all data related functionality including
     passing data from coating layer to coating layer-->
     <dd-data core-data='{{core}}' coating-data='{{coatings}}' capsule-data='{{capsule}}'></dd-data>
-  
-    <!-- Page -->
-    <paper-header-panel class='flex' id='paperDrawerPanel'>
-
-      <!-- Main Toolbar -->
-      <paper-toolbar>
-        
-        <!--<paper-icon-button icon="icons:menu"></paper-icon-button>-->
-        <div class='app-name'>Dosage Designer</div>
-        <paper-tabs class='flex' scrollable no-bar selected='{{card}}' on-selected-changed='cardSelected'>
-          <paper-tab>Core</paper-tab>
-          <template is='dom-repeat' items='{{coatings}}'>
-            <paper-tab>{{item.name}}</paper-tab>
-          </template>
-          <paper-tab>Capsule</paper-tab>
-          <paper-tab>Report</paper-tab>
-        </paper-tabs>  
-        <!--<paper-icon-button icon="icons:more-vert" on-tap='_onPrint'></paper-icon-button>-->
-        
-      </paper-toolbar>
-
-      <!-- Main Content -->
-      <neon-animated-pages id='nap' class='fit'>
-        
-        <dd-core-card details='{{core}}'></dd-core-card>
+    
+    <paper-drawer-panel force-narrow>
       
-        <template id='coatings' is='dom-repeat' items='{{coatings}}'>
-          <dd-coating-card details='{{item}}'></dd-coating-card>
-        </template> 
+      <paper-header-panel drawer>
+        <paper-toolbar>
+          <h4>Menu</h4>
+        </paper-toolbar>
         
-        <dd-capsule-card details='{{capsule}}'></dd-capsule-card>
+        <iron-selector on-selected-changed='cardSelected' on-tap='closeDrawer'>
+          <paper-item>Core</paper-item>
+          <template id='coatings' is='dom-repeat' items='{{coatings}}'>
+            <paper-item>{{item.name}}</paper-item>
+          </template> 
+          <paper-item>Capsule</paper-item>
+          <paper-item>Report</paper-item>
+        </iron-selector>
         
-        <dd-report-card core='{{core}}' coatings='{{coatings}}' capsule='{{capsule}}'></dd-report-card>
+      </paper-header-panel>
+    
+      <!-- Page -->
+      <paper-header-panel main class='flex'>
+  
+        <!-- Main Toolbar -->
+        <paper-toolbar>
+          
+          <paper-icon-button icon="icons:menu"  paper-drawer-toggle hidden='{{!narrowLayout}}'></paper-icon-button>
+          <div class='app-name'>Dosage Designer</div>
+          <paper-tabs class='flex' scrollable no-bar selected='{{card}}' on-selected-changed='cardSelected' hidden='{{narrowLayout}}'>
+            <paper-tab>Core</paper-tab>
+            <template is='dom-repeat' items='{{coatings}}'>
+              <paper-tab>{{item.name}}</paper-tab>
+            </template>
+            <paper-tab>Capsule</paper-tab>
+            <paper-tab>Report</paper-tab>
+          </paper-tabs>  
+          <span id='tab-spacer' class='flex' hidden='{{!narrowLayout}}'></span>
+          <paper-menu-button id='moreMenu' horizontal-align='right' ignore-select>
+            <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+            <div class="dropdown-content extra-menu">
+              <paper-icon-item on-tap='goHome'>
+                <iron-icon icon='icons:home' item-icon></iron-icon>
+                Home
+              </paper-icon-item>
+              <!--<paper-icon-item on-tap='resetValues' role="menuitem">-->
+              <!--  <iron-icon icon='icons:refresh' item-icon></iron-icon>-->
+              <!--  Reset All Values-->
+              <!--</paper-icon-item>-->
+              <!--<paper-icon-item on-tap='toggleSync' disabled$='{{!userKnown}}' role="menuitemcheckbox">-->
+              <!--  <iron-icon icon='icons:cloud-upload' item-icon></iron-icon>-->
+              <!--  <div class="flex">Sync Data</div>-->
+              <!--  <paper-checkbox checked='{{syncData}}' disabled$='{{!userKnown}}'></paper-checkbox>-->
+              <!--</paper-icon-item>-->
+            </div>
+          </paper-menu-button>
+        </paper-toolbar>
+  
+        <!-- Main Content -->
+        <neon-animated-pages id='nap' class='fit'>
+          
+          <dd-core-card details='{{core}}'></dd-core-card>
         
-      </neon-animated-pages> 
-        
-    </paper-header-panel>
+          <template id='coatings' is='dom-repeat' items='{{coatings}}'>
+            <dd-coating-card details='{{item}}'></dd-coating-card>
+          </template> 
+          
+          <dd-capsule-card details='{{capsule}}'></dd-capsule-card>
+          
+          <dd-report-card core='{{core}}' coatings='{{coatings}}' capsule='{{capsule}}'></dd-report-card>
+          
+        </neon-animated-pages> 
+          
+      </paper-header-panel>
+    
+    </paper-drawer-panel>  
     
     <!--Toast to show when fired from other element-->
     <paper-toast id="toast" duration="6000"></paper-toast>
@@ -110,15 +147,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                  text="Caching complete! This app will work offline.">
     </paper-toast>
 
-    <!--<platinum-sw-register auto-register-->
-    <!--                      clients-claim-->
-    <!--                      skip-waiting-->
-    <!--                      base-uri="elements/bootstrap"-->
-    <!--                      on-service-worker-installed="displayInstalledToast">-->
-    <!--  <platinum-sw-cache default-cache-strategy="fastest"-->
-    <!--                     cache-config-file="cache-config.json">-->
-    <!--  </platinum-sw-cache>-->
-    <!--</platinum-sw-register>-->
+    <platinum-sw-register auto-register
+                          clients-claim
+                          skip-waiting
+                          base-uri="elements/bootstrap"
+                          on-service-worker-installed="displayInstalledToast">
+      <platinum-sw-cache default-cache-strategy="fastest"
+                         cache-config-file="cache-config.json">
+      </platinum-sw-cache>
+    </platinum-sw-register>
+    
+    <iron-media-query query="(max-width: 901px)" query-matches="{{narrowLayout}}"></iron-media-query>
 
   </template>
 

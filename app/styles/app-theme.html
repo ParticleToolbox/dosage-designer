@@ -42,9 +42,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   }
 
   /* General styles */
+  
+  paper-drawer-panel {
+    @apply(--layout-fit);
+    background-color: var(--background-color);
+  }
+  
   neon-animated-pages {
     height: 100%;
     overflow: hidden;
+  }
+  
+  .extra-menu {
+    padding: 12px 8px;
+    background: white;
+    color: #888888;
+  }
+  
+  .extra-menu > paper-icon-item:hover {
+    color: var(--dark-primary-color);
+    background-color: var(--background-color);
   }
   
   .app-name {
